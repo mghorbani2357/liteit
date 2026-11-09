@@ -1,0 +1,51 @@
+# {{ project_name }}
+
+Litestar + Granian ASGI API scaffolded with [liteit](https://github.com/mghorbani2357/liteit).
+
+## Setup
+
+```bash
+python -m venv .venv
+# activate .venv
+pip install -U pip && pip install -r requirements.txt
+cp .env.example .env
+```
+
+## Run
+
+```bash
+liteit run --reload
+# or:
+granian --interface asgi app.main:app --reload
+```
+
+- API health: http://127.0.0.1:8000/health
+- Swagger UI: http://127.0.0.1:8000/docs
+
+## Generate a controller
+
+```bash
+liteit generate controller users
+# alias:
+liteit gen controller users
+```
+
+New modules under `app/controllers/` are discovered automatically on restart.
+
+## Tests
+
+```bash
+pytest
+```
+
+## Docker
+
+```bash
+docker build -t {{ project_name }} .
+docker run --rm -p 8000:8000 {{ project_name }}
+```
+
+## Notes
+
+- Sync ``def`` handlers run in Granian's blocking thread pool; prefer ``async def`` for I/O.
+- JWT helpers live in `app/core/security.py` (not enabled by default).

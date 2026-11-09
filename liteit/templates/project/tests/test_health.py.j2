@@ -1,0 +1,11 @@
+"""Health endpoint smoke tests."""
+
+from __future__ import annotations
+
+from litestar.testing import AsyncTestClient
+
+
+async def test_health(client: AsyncTestClient) -> None:
+    response = await client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}

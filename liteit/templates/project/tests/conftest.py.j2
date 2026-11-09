@@ -1,0 +1,16 @@
+"""Shared pytest fixtures for {{ project_name }}."""
+
+from __future__ import annotations
+
+import pytest
+from litestar.testing import AsyncTestClient
+
+from app.main import create_app
+
+
+@pytest.fixture
+async def client() -> AsyncTestClient:
+    """Async Litestar test client bound to a fresh app instance."""
+    app = create_app()
+    async with AsyncTestClient(app=app) as test_client:
+        yield test_client

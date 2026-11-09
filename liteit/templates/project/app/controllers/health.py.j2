@@ -1,0 +1,19 @@
+"""Health / ping controller."""
+
+from __future__ import annotations
+
+from litestar import Controller, get
+
+from app.schemas.health import HealthResponse
+
+
+class HealthController(Controller):
+    """Liveness probe endpoints."""
+
+    path = "/health"
+    tags = ["health"]
+
+    @get()
+    async def health(self) -> HealthResponse:
+        """Return a simple healthy status payload."""
+        return HealthResponse(status="ok")

@@ -1,0 +1,48 @@
+"""{{ title }} controller (CRUD stubs)."""
+
+from __future__ import annotations
+
+from uuid import UUID
+
+from litestar import Controller, delete, get, post
+from litestar.exceptions import NotFoundException
+from litestar.status_codes import HTTP_201_CREATED, HTTP_204_NO_CONTENT
+
+from app.schemas.{{ name }} import (
+    {{ class_prefix }}CreateDTO,
+    {{ class_prefix }}ResponseDTO,
+)
+
+
+class {{ class_prefix }}Controller(Controller):
+    """CRUD stubs for {{ title }}.
+
+    Sync ``def`` handlers would run in Granian's blocking thread pool;
+    these stubs use ``async def`` so they stay on the event loop.
+    """
+
+    path = "/{{ name }}"
+    tags = ["{{ name }}"]
+
+    @get()
+    async def list_{{ name }}(self) -> list[{{ class_prefix }}ResponseDTO]:
+        """List {{ title }} resources."""
+        return []
+
+    @get("/{item_id:uuid}")
+    async def get_by_id(self, item_id: UUID) -> {{ class_prefix }}ResponseDTO:
+        """Fetch a single {{ title }} by id."""
+        raise NotFoundException(detail=f"{{ class_prefix }} {item_id} not found")
+
+    @post(status_code=HTTP_201_CREATED)
+    async def create(
+        self,
+        data: {{ class_prefix }}CreateDTO,
+    ) -> {{ class_prefix }}ResponseDTO:
+        """Create a {{ title }} resource."""
+        return {{ class_prefix }}ResponseDTO(id=UUID(int=0), **data.model_dump())
+
+    @delete("/{item_id:uuid}", status_code=HTTP_204_NO_CONTENT)
+    async def delete_item(self, item_id: UUID) -> None:
+        """Delete a {{ title }} resource."""
+        raise NotFoundException(detail=f"{{ class_prefix }} {item_id} not found")

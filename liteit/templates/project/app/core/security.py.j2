@@ -1,0 +1,46 @@
+"""Litestar JWT authentication stub.
+
+This module is intentionally not wired into ``create_app()`` by default.
+Import and register ``jwt_auth`` (or its middleware / guards) when you are
+ready to protect routes::
+
+    app = Litestar(
+        route_handlers=...,
+        on_app_init=[jwt_auth.on_app_init],
+    )
+"""
+
+from __future__ import annotations
+
+from datetime import timedelta
+from typing import Any
+from uuid import UUID
+
+from litestar.connection import ASGIConnection
+from litestar.security.jwt import JWTAuth, Token
+
+from app.config import settings
+
+
+async def retrieve_user_handler(
+    token: Token,
+    connection: ASGIConnection[Any, Any, Any, Any],  # noqa: ARG001
+) -> dict[str, Any] | None:
+    """Resolve the current user from a decoded JWT.
+
+    Replace this stub with a real user lookup (database, cache, etc.).
+    """
+    return {"id": token.sub}
+
+
+jwt_auth = JWTAuth[dict[str, Any]](
+    retrieve_user_handler=retrieve_user_handler,
+    token_secret=settings.jwt_secret,
+    algorithm=settings.jwt_algorithm,
+    default_token_expiration=timedelta(seconds=settings.jwt_expiration_seconds),
+)
+
+
+def create_access_token(*, user_id: UUID | str) -> str:
+    """Encode a signed access token for *user_id* (helper for login stubs)."""
+    return jwt_auth.create_token(identifier=str(user_id))

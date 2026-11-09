@@ -1,0 +1,50 @@
+"""Structlog JSON configuration with timezone-aware ISO-8601 timestamps."""
+
+from __future__ import annotations
+
+import logging
+import sys
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+import structlog
+
+from app.config import settings
+
+
+def _iso_timestamp(
+    logger: object,  # noqa: ARG001
+    method_name: str,  # noqa: ARG001
+    event_dict: dict,
+) -> dict:
+    """Add an ISO-8601 timestamp using the configured timezone."""
+    tz = ZoneInfo(settings.timezone)
+    now = datetime.now(tz)
+    event_dict["timestamp"] = now.isoformat()
+    event_dict["timezone"] = settings.timezone
+    event_dict["tz_offset"] = now.strftime("%z")
+    return event_dict
+
+
+def configure_logging() -> None:
+    """Configure structlog for JSON console output."""
+    shared_processors: list[structlog.types.Processor] = [
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.add_logger_name,
+        _iso_timestamp,
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+    ]
+
+    structlog.configure(
+        processors=[
+            *shared_processors,
+            structlog.processors.JSONRenderer(),
+        ],
+        wrapper_class=structlog.stdlib.BoundLogger,
+        logger_factory=structlog.PrintLoggerFactory(file=sys.stdout),
+        cache_logger_on_first_use=True,
+    )
+
+    logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.INFO)

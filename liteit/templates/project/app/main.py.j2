@@ -1,0 +1,57 @@
+"""Application factory and controller auto-loader for {{ project_name }}.
+
+Handler concurrency notes (Granian ASGI):
+- ``async def`` route handlers run directly on the event loop.
+- Regular ``def`` route handlers run in Granian's blocking thread pool
+  (configured via ``--blocking-threads``). Prefer ``async def`` for I/O-bound
+  work; use sync ``def`` only for CPU-bound or blocking library calls.
+"""
+
+from __future__ import annotations
+
+import importlib
+import inspect
+import pkgutil
+from typing import Type
+
+from litestar import Controller, Litestar
+from litestar.openapi.config import OpenAPIConfig
+from litestar.openapi.plugins import SwaggerRenderPlugin
+
+from app import controllers as controllers_pkg
+from app.config import settings
+from app.core.logging import configure_logging
+
+
+def discover_controllers() -> list[Type[Controller]]:
+    """Import all modules under ``app.controllers`` and collect Controller subclasses."""
+    found: list[Type[Controller]] = []
+    prefix = controllers_pkg.__name__ + "."
+    for module_info in pkgutil.iter_modules(controllers_pkg.__path__, prefix):
+        module = importlib.import_module(module_info.name)
+        for _, obj in inspect.getmembers(module, inspect.isclass):
+            if (
+                issubclass(obj, Controller)
+                and obj is not Controller
+                and obj.__module__ == module.__name__
+            ):
+                found.append(obj)
+    return found
+
+
+def create_app() -> Litestar:
+    """Build and return the Litestar application."""
+    configure_logging()
+    return Litestar(
+        route_handlers=discover_controllers(),
+        debug=settings.debug,
+        openapi_config=OpenAPIConfig(
+            title=settings.app_name,
+            version=settings.app_version,
+            path="/docs",
+            render_plugins=[SwaggerRenderPlugin()],
+        ),
+    )
+
+
+app = create_app()

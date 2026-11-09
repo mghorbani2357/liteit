@@ -1,0 +1,30 @@
+"""Pydantic DTOs for {{ title }}."""
+
+from __future__ import annotations
+
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class {{ class_prefix }}CreateDTO(BaseModel):
+    """Payload for creating a {{ title }}."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(min_length=1, examples=["example"])
+
+
+class {{ class_prefix }}UpdateDTO(BaseModel):
+    """Payload for updating a {{ title }}."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str | None = Field(default=None, min_length=1)
+
+
+class {{ class_prefix }}ResponseDTO(BaseModel):
+    """Public {{ title }} representation."""
+
+    id: UUID
+    name: str

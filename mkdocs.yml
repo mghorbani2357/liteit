@@ -1,0 +1,46 @@
+site_name: liteit
+site_description: CLI scaffolding for Litestar + Granian ASGI APIs with modular controllers, OpenAPI, logging, and Docker.
+site_url: https://liteit.readthedocs.io/
+repo_url: https://github.com/mghorbani2357/liteit
+edit_uri: edit/master/docs/
+
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - python
+    - yaml
+    - bash
+    - dockerfile
+  navigation_depth: 3
+  collapse_navigation: false
+  sticky_navigation: true
+  include_homepage_in_sidebar: true
+  prev_next_buttons_location: bottom
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Quick start: quickstart.md
+  - CLI reference: cli.md
+  - Architecture: architecture.md
+  - Controllers: controllers.md
+  - Configuration: configuration.md
+  - Logging: logging.md
+  - OpenAPI / Swagger: openapi.md
+  - Security (JWT): security.md
+  - Runtime: runtime.md
+  - Docker: docker.md
+  - Extending: extending.md
+  - Publish: publishing.md
+
+plugins:
+  - search
